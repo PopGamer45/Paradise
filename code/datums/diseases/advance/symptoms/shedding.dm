@@ -26,7 +26,7 @@ BONUS
 
 /datum/symptom/shedding/Activate(datum/disease/advance/A)
 	..()
-	if(!prob(SYMPTOM_ACTIVATION_PROB))
+	if(!prob(max(SYMPTOM_ACTIVATION_PROB * getImmunityLossMultiplier(), 9)))
 		return
 	if(!ishuman(A.affected_mob))
 		return

@@ -157,6 +157,16 @@ GLOBAL_LIST_INIT(diseases, subtypesof(/datum/disease))
 		affected_mob.create_log(MISC_LOG, "has been cured from the virus \"[src]\"")
 	qdel(src)
 
+//Returns immunity loss multiplier based on affected mob damage, used to make symptoms more dangerous. Use division var if multiplier is too much for a symptom
+/mob/living/carbon/getImmunityLossMultiplier(var/division_adjustment)
+	if(istype(affected_mob, /mob/living/carbon))
+		var/blood_loss = 100 - round((affected_mob.blood_volume / BLOOD_VOLUME_NORMAL)*100)
+		var/immunityLoss = ((affected_mob.getToxLoss() * 1.75) + (affected_mob.blood_loss * 1.5) + (affected_mob.getBruteLoss() * 1.25) + affected_mob.getFireLoss()) / 120
+		if(division_adjustment)
+			immunityLoss /= division_adjustment
+		immunityLoss + 1
+		return immunityLoss
+
 /datum/disease/proc/IsSame(datum/disease/D)
 	if(istype(src, D.type))
 		return 1
