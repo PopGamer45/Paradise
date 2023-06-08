@@ -48,6 +48,7 @@ GLOBAL_LIST_EMPTY(mirrors) //list of all mirrors and mirror shields.
 GLOBAL_LIST_EMPTY(arc_emitters) 					//list of all arc emitters
 
 GLOBAL_LIST_INIT(active_diseases, list()) 			//List of Active disease in all mobs; purely for quick referencing.
+GLOBAL_LIST_INIT(station_blood_splatter, list()) 	//List of Blood splatter on station, used for additional chance of outbreaks happening
 
 GLOBAL_LIST_EMPTY(mob_spawners) 		    // All mob_spawn objects
 GLOBAL_LIST_EMPTY(explosive_walls)

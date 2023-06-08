@@ -35,6 +35,8 @@ GLOBAL_LIST_EMPTY(splatter_cache)
 /obj/effect/decal/cleanable/blood/Initialize(mapload)
 	. = ..()
 	update_icon()
+	if(is_station_level(src.z))
+		GLOB.station_blood_splatter += src
 	if(type == /obj/effect/decal/cleanable/blood/gibs)
 		return
 	if(!.)
@@ -43,6 +45,8 @@ GLOBAL_LIST_EMPTY(splatter_cache)
 /obj/effect/decal/cleanable/blood/Destroy()
 	if(dry_timer)
 		deltimer(dry_timer)
+	if(src in GLOB.station_blood_splatter)
+		GLOB.station_blood_splatter -= src
 	return ..()
 
 /obj/effect/decal/cleanable/blood/update_icon()

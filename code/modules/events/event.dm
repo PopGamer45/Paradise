@@ -79,6 +79,16 @@
   * setting the startWhen and or announceWhen variables.
   * Only called once.
   */
+
+/datum/event/proc/get_weight_modifier()
+	return
+
+/**
+  * Called when events are being picked based on weight.
+  *
+  * Allows you to add additional weights that need calculations.
+  */
+
 /datum/event/proc/setup()
 	return
 

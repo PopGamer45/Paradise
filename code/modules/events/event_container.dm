@@ -64,7 +64,7 @@ GLOBAL_LIST_EMPTY(event_last_fired)
 	for(var/datum/event_meta/EM in available_events)
 		var/event_weight = EM.get_weight(active_with_role)
 		if(EM.enabled && event_weight)
-			possible_events[EM] = event_weight
+			possible_events[EM] = event_weight + EM.event_type.get_weight_modifier()
 
 	for(var/event_meta in last_event_time) if(possible_events[event_meta])
 		var/time_passed = world.time - GLOB.event_last_fired[event_meta]
