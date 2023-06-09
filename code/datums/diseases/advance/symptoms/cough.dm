@@ -27,7 +27,7 @@ BONUS
 
 /datum/symptom/cough/Activate(datum/disease/advance/A)
 	..()
-	if(prob(max(SYMPTOM_ACTIVATION_PROB * getImmunityLossMultiplier(), 9)))
+	if(prob(max(SYMPTOM_ACTIVATION_PROB * A.getImmunityLossMultiplier(), 9)))
 		var/mob/living/M = A.affected_mob
 		switch(A.stage)
 			if(1, 2, 3)

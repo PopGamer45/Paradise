@@ -37,12 +37,12 @@ Bonus
 			if(1, 2, 3, 4)
 				to_chat(M, "<span class='warning'>[pick("You feel nauseous.", "You feel like you're going to throw up!")]</span>")
 			else
-				Vomit(M)
+				Vomit(M, A)
 
 	return
 
-/datum/symptom/vomit/proc/Vomit(mob/living/carbon/M)
-	M.vomit(20 * getImmunityLossMultiplier())
+/datum/symptom/vomit/proc/Vomit(mob/living/carbon/M, datum/disease/advance/A)
+	M.vomit(20 * A.getImmunityLossMultiplier())
 
 /*
 //////////////////////////////////////
@@ -74,8 +74,8 @@ Bonus
 	level = 4
 	severity = 5
 
-/datum/symptom/vomit/blood/Vomit(mob/living/carbon/M)
-	M.vomit(0, 1 * getImmunityLossMultiplier())
+/datum/symptom/vomit/blood/Vomit(mob/living/carbon/M, datum/disease/advance/A)
+	M.vomit(0, 1 * A.getImmunityLossMultiplier())
 
 
 /*
@@ -102,5 +102,5 @@ Bonus
 	stealth = -2
 	level = 4
 
-/datum/symptom/vomit/projectile/Vomit(mob/living/carbon/M)
-	M.vomit(6 * getImmunityLossMultiplier(),0,1 * getImmunityLossMultiplier(),5,1)
+/datum/symptom/vomit/projectile/Vomit(mob/living/carbon/M, datum/disease/advance/A)
+	M.vomit(6 * A.getImmunityLossMultiplier(),0,1 * A.getImmunityLossMultiplier(),5,1)

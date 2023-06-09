@@ -36,6 +36,6 @@ Bonus
 	return
 
 /datum/symptom/fever/proc/Heat(mob/living/M, datum/disease/advance/A)
-	var/get_heat = (sqrtor0(21+A.totalTransmittable()*2))+(sqrtor0(20+A.totalStageSpeed()*3)) * getImmunityLossMultiplier()
+	var/get_heat = (sqrtor0(21+A.totalTransmittable()*2))+(sqrtor0(20+A.totalStageSpeed()*3)) * A.getImmunityLossMultiplier()
 	M.bodytemperature = min(M.bodytemperature + (get_heat * A.stage), BODYTEMP_HEAT_DAMAGE_LIMIT - 1)
 	return 1

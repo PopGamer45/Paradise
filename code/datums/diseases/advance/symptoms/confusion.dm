@@ -35,6 +35,6 @@ Bonus
 				to_chat(M, "<span class='warning'>[pick("Your head hurts.", "Your mind blanks for a moment.")]</span>")
 			else
 				to_chat(M, "<span class='userdanger'>You can't think straight!</span>")
-				M.AdjustConfused(16 SECONDS * getImmunityLossMultiplier(), bound_lower = 0, bound_upper = 200 SECONDS)
+				M.AdjustConfused(16 SECONDS * A.getImmunityLossMultiplier(), bound_lower = 0, bound_upper = 200 SECONDS)
 
 	return
