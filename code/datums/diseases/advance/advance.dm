@@ -9,12 +9,18 @@
 GLOBAL_LIST_EMPTY(archive_diseases)
 
 // The order goes from easy to cure to hard to cure.
-GLOBAL_LIST_INIT(advance_cures, list(
-									"sodiumchloride", "sugar", "orangejuice",
-									"spaceacillin", "salglu_solution", "ethanol",
-									"teporone", "diphenhydramine", "lipolicide",
-									"silver", "gold"
-))
+GLOBAL_LIST_INIT(resistance1_cures, list("sodiumchloride", "sugar", "orangejuice"))
+GLOBAL_LIST_INIT(resistance2_cures, list("spaceacillin", "salglu_solution", "ethanol", "mutagen"))
+GLOBAL_LIST_INIT(resistance3_cures, list("applejack", "syndicatebomb", "space_drugs"))
+GLOBAL_LIST_INIT(resistance4_cures, list("msg", "omnizine", "changelingsting"))
+GLOBAL_LIST_INIT(resistance5_cures, list("ether", "kelotane", "synthflesh"))
+GLOBAL_LIST_INIT(resistance6_cures, list("nothing", "jenkem", "fishwater"))
+GLOBAL_LIST_INIT(resistance7_cures, list("lsd", "liquid_solder", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance8_cures, list("lazarus_reagent", "sodiumchloride", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance9_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance10_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance11_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
+GLOBAL_LIST(advance_cures)
 
 /*
 
@@ -56,6 +62,44 @@ GLOBAL_LIST_INIT(advance_cures, list(
 		else
 			for(var/datum/symptom/S in D.symptoms)
 				symptoms += new S.type
+
+	if(!GLOB.advance_cures)
+		GLOB.advance_cures = list()
+		var/resistance_levels = 11
+		GLOB.advance_cures.len = resistance_levels
+		for(var/i=1,i<=resistance_levels,i++)
+			GLOB.advance_cures[i] = list()
+		GLOB.advance_cures[1] += GLOB.resistance1_cures[rand(1, GLOB.resistance1_cures.len)]
+		GLOB.advance_cures[2] += GLOB.resistance2_cures[rand(1, GLOB.resistance2_cures.len)]
+		GLOB.advance_cures[3] += GLOB.resistance3_cures[rand(1, GLOB.resistance3_cures.len)]
+		GLOB.advance_cures[4] += GLOB.resistance4_cures[rand(1, GLOB.resistance4_cures.len)]
+		GLOB.advance_cures[5] += GLOB.resistance5_cures[rand(1, GLOB.resistance5_cures.len)]
+		GLOB.advance_cures[6] += GLOB.resistance6_cures[rand(1, GLOB.resistance6_cures.len)]
+		var/list/resistance_cures7 = GLOB.resistance7_cures
+		for(var/i=0,i<2,i++)
+			var/S = resistance_cures7[rand(1, resistance_cures7.len)]
+			GLOB.advance_cures[7] += S
+			resistance_cures7 -= S
+		var/list/resistance_cures8 = GLOB.resistance8_cures
+		for(var/i=0,i<2,i++)
+			var/S = resistance_cures8[rand(1, resistance_cures8.len)]
+			GLOB.advance_cures[8] += S
+			resistance_cures8 -= S
+		var/list/resistance_cures9 = GLOB.resistance9_cures
+		for(var/i=0,i<2,i++)
+			var/S = resistance_cures9[rand(1, resistance_cures9.len)]
+			GLOB.advance_cures[9] += S
+			resistance_cures9 -= S
+		var/list/resistance_cures10 = GLOB.resistance10_cures
+		for(var/i=0,i<2,i++)
+			var/S = resistance_cures10[rand(1, resistance_cures10.len)]
+			GLOB.advance_cures[10] += S
+			resistance_cures10 -= S
+		var/list/resistance_cures11 = GLOB.resistance11_cures
+		for(var/i=0,i<3,i++)
+			var/S = resistance_cures11[rand(1, resistance_cures11.len)]
+			GLOB.advance_cures[11] += S
+			resistance_cures11 -= S
 
 	Refresh()
 	..(process, D)
@@ -266,11 +310,16 @@ GLOBAL_LIST_INIT(advance_cures, list(
 	if(properties && properties.len)
 		var/res = clamp(properties["resistance"] - (symptoms.len / 2), 1, GLOB.advance_cures.len)
 //		to_chat(world, "Res = [res]")
-		cures = list(GLOB.advance_cures[res])
+		cures = GLOB.advance_cures[res]
+		var/list/cure_names = list()
+		cure_names.len = cures.len
+		var/i = 0
+		for(var/C in cures)
+			i++
+			cure_names[i] = GLOB.chemical_reagents_list[cures[i]].name
 
-		// Get the cure name from the cure_id
-		var/datum/reagent/D = GLOB.chemical_reagents_list[cures[1]]
-		cure_text = D.name
+		// Get the cure name from the cures
+		cure_text = jointext(cure_names, " & ")
 
 
 	return
