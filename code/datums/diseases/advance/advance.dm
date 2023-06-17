@@ -316,7 +316,8 @@ GLOBAL_LIST(advance_cures)
 		var/i = 0
 		for(var/C in cures)
 			i++
-			cure_names[i] = GLOB.chemical_reagents_list[cures[i]].name
+			var/datum/reagent/C = GLOB.chemical_reagents_list[cures[i]]
+			cure_names[i] = C.name
 
 		// Get the cure name from the cures
 		cure_text = jointext(cure_names, " & ")
