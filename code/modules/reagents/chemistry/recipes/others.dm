@@ -492,3 +492,17 @@
 		var/datum/disease/advance/D = locate(/datum/disease/advance) in B.data["viruses"]
 		if(D)
 			D.Devolve()
+
+/datum/chemical_reaction/mix_virus/stabilize_virus
+	name = "Stabilize Virus"
+	id = "stabilizevirus"
+	required_reagents = list("stabilizing_agent" = 1)
+	required_catalysts = list("blood" = 1)
+
+/datum/chemical_reaction/mix_virus/stabilize_virus/on_reaction(datum/reagents/holder, created_volume)
+	var/datum/reagent/blood/B = locate(/datum/reagent/blood) in holder.reagent_list
+	if(B && B.data)
+		var/datum/disease/advance/D = locate(/datum/disease/advance) in B.data["viruses"]
+		if(D)
+			if(!D.mutated)
+				D.can_mutate = FALSE

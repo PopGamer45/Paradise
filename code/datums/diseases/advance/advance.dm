@@ -15,11 +15,15 @@ GLOBAL_LIST_INIT(resistance3_cures, list("applejack", "syndicatebomb", "space_dr
 GLOBAL_LIST_INIT(resistance4_cures, list("msg", "omnizine", "changelingsting"))
 GLOBAL_LIST_INIT(resistance5_cures, list("ether", "kelotane", "synthflesh"))
 GLOBAL_LIST_INIT(resistance6_cures, list("nothing", "jenkem", "fishwater"))
-GLOBAL_LIST_INIT(resistance7_cures, list("lsd", "liquid_solder", "sodiumchloride"))
-GLOBAL_LIST_INIT(resistance8_cures, list("lazarus_reagent", "sodiumchloride", "sodiumchloride"))
-GLOBAL_LIST_INIT(resistance9_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
-GLOBAL_LIST_INIT(resistance10_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
-GLOBAL_LIST_INIT(resistance11_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance7_cures, list("lsd", "liquid_solder", "capulettium"))
+GLOBAL_LIST_INIT(resistance8_cures, list("cleaner", "acetaldehyde", "antihol"))
+GLOBAL_LIST_INIT(resistance8B_cures, list("triple_citrus", "atrazine", "space_drugs"))
+GLOBAL_LIST_INIT(resistance9_cures, list("capulettium", "acetic_acid", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance9B_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance10_cures, list("cyanide", "sulfonal", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance10B_cures, list("sodiumchloride", "sodiumchloride", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance11_cures, list("lazarus_reagent", "sulfonal", "sodiumchloride"))
+GLOBAL_LIST_INIT(resistance11B_cures, list("cyanide", "sodiumchloride", "sodiumchloride"))
 GLOBAL_LIST(advance_cures)
 
 /*
@@ -43,6 +47,12 @@ GLOBAL_LIST(advance_cures)
 	var/list/symptoms = list() // The symptoms of the disease.
 	var/id = ""
 	var/processing = FALSE
+	var/mutated = FALSE
+	var/can_mutate = TRUE
+	var/mutate_cooldown = 75 SECONDS
+	var/last_mutate
+	var/mutation_generation = 0 //Order of this disease in a "mutation tree chart"
+	var/datum/disease/parent_mutation //The disease that this disease was mutated from
 
 /*
 
@@ -60,8 +70,15 @@ GLOBAL_LIST(advance_cures)
 		if(!D || !D.symptoms || !D.symptoms.len)
 			symptoms = GenerateSymptoms(0, 2)
 		else
-			for(var/datum/symptom/S in D.symptoms)
-				symptoms += new S.type
+			var/list/skipped = list("type","parent_type","vars","transformed")
+			for(var/V in D.vars)
+				if(V in skipped)
+					continue
+				if(istype(D.vars[V],/list))
+					var/list/L = D.vars[V]
+					vars[V] = L.Copy()
+				else
+					vars[V] = D.vars[V]
 
 	if(!GLOB.advance_cures)
 		GLOB.advance_cures = list()
@@ -75,31 +92,11 @@ GLOBAL_LIST(advance_cures)
 		GLOB.advance_cures[4] += GLOB.resistance4_cures[rand(1, GLOB.resistance4_cures.len)]
 		GLOB.advance_cures[5] += GLOB.resistance5_cures[rand(1, GLOB.resistance5_cures.len)]
 		GLOB.advance_cures[6] += GLOB.resistance6_cures[rand(1, GLOB.resistance6_cures.len)]
-		var/list/resistance_cures7 = GLOB.resistance7_cures
-		for(var/i=0,i<2,i++)
-			var/S = resistance_cures7[rand(1, resistance_cures7.len)]
-			GLOB.advance_cures[7] += S
-			resistance_cures7 -= S
-		var/list/resistance_cures8 = GLOB.resistance8_cures
-		for(var/i=0,i<2,i++)
-			var/S = resistance_cures8[rand(1, resistance_cures8.len)]
-			GLOB.advance_cures[8] += S
-			resistance_cures8 -= S
-		var/list/resistance_cures9 = GLOB.resistance9_cures
-		for(var/i=0,i<2,i++)
-			var/S = resistance_cures9[rand(1, resistance_cures9.len)]
-			GLOB.advance_cures[9] += S
-			resistance_cures9 -= S
-		var/list/resistance_cures10 = GLOB.resistance10_cures
-		for(var/i=0,i<2,i++)
-			var/S = resistance_cures10[rand(1, resistance_cures10.len)]
-			GLOB.advance_cures[10] += S
-			resistance_cures10 -= S
-		var/list/resistance_cures11 = GLOB.resistance11_cures
-		for(var/i=0,i<3,i++)
-			var/S = resistance_cures11[rand(1, resistance_cures11.len)]
-			GLOB.advance_cures[11] += S
-			resistance_cures11 -= S
+		GLOB.advance_cures[7] += GLOB.resistance7_cures[rand(1, GLOB.resistance7_cures.len)]
+		GLOB.advance_cures[8] += GLOB.resistance8_cures[rand(1, GLOB.resistance8_cures.len)] += GLOB.resistance8B_cures[rand(1, GLOB.resistance8B_cures.len)]
+		GLOB.advance_cures[9] += GLOB.resistance9_cures[rand(1, GLOB.resistance9_cures.len)] += GLOB.resistance9B_cures[rand(1, GLOB.resistance9B_cures.len)]
+		GLOB.advance_cures[10] += GLOB.resistance10_cures[rand(1, GLOB.resistance10_cures.len)] += GLOB.resistance10B_cures[rand(1, GLOB.resistance10B_cures.len)]
+		GLOB.advance_cures[11] += GLOB.resistance11_cures[rand(1, GLOB.resistance11_cures.len)] += GLOB.resistance11B_cures[rand(1, GLOB.resistance11B_cures.len)]
 
 	Refresh()
 	..(process, D)
@@ -124,6 +121,11 @@ GLOBAL_LIST(advance_cures)
 
 		for(var/datum/symptom/S in symptoms)
 			S.Activate(src)
+
+		if(!last_mutate)
+			last_mutate = world.time
+		if(world.time > last_mutate + mutate_cooldown && prob(3))
+			Mutate()
 	else
 		CRASH("We do not have any symptoms during stage_act()!")
 	return TRUE
@@ -139,11 +141,12 @@ GLOBAL_LIST(advance_cures)
 	return 1
 
 // To add special resistances.
-/datum/disease/advance/cure(resistance=1)
+/datum/disease/advance/cure(resistance = FALSE)
 	if(affected_mob)
 		var/id = "[GetDiseaseID()]"
 		if(resistance && !(id in affected_mob.resistances))
 			affected_mob.resistances[id] = id
+		affected_mob.antibodies[id] = id
 		remove_virus()
 	qdel(src)	//delete the datum to stop it processing
 
@@ -156,6 +159,83 @@ GLOBAL_LIST(advance_cures)
 	NEW PROCS
 
  */
+
+// Randomly mutates the virus either by adding or replacing symptoms
+/datum/disease/advance/proc/Mutate(var/cooldown = TRUE, var/forced = FALSE)
+	var/datum/disease/advance/parent = src.Copy()
+	var/datum/symptom/old_symptom
+	var/datum/symptom/new_symptom
+	if(!forced && !can_mutate && !affected_mob.reagents.has_reagent("spaceacillin"))
+		return
+	if(prob(100/symptoms.len) || symptoms.len == 1)
+		new_symptom = GenerateSymptomsBySeverity(1, GetSeverity())[1]
+	else
+		// Makes the virus unable to mutate one symptom with the highest severity
+		var/list/symptoms_pick = symptoms.Copy()
+		var/datum/symptom/R
+		for(var/datum/symptom/S in symptoms_pick)
+			if(!R)
+				R = S
+				continue
+			if(S.severity > R.severity)
+				R = S
+		symptoms_pick -= R
+		old_symptom = pick(symptoms_pick)
+		new_symptom = GenerateSymptomsBySeverity(old_symptom.severity, old_symptom.severity + 1)[1]
+	var/datum/disease/advance/new_virus = src.Copy()
+	if(old_symptom)
+		new_virus.RemoveSymptom(old_symptom)
+	new_virus.AddSymptom(new_symptom)
+	new_virus.id = null
+	if(new_virus.GetDiseaseID() in GLOB.archive_diseases)
+		return FALSE
+
+	if(old_symptom)
+		RemoveSymptom(old_symptom)
+	AddSymptom(new_symptom)
+	new_symptom.Start(src)
+	Refresh(1)
+	mutated = TRUE
+	mutation_generation += 1
+	parent_mutation = parent.Copy()
+	if(cooldown)
+		last_mutate = world.time
+
+// Gets the distance from this disease to another in the "mutation tree"
+/datum/disease/advance/GetMutationDistance(var/datum/disease/advance/D)
+	var/datum/disease/advance/disease1 = src
+	var/datum/disease/advance/disease2 = D
+	var/distance = 0
+	if(!IsSameMutationTree(disease2))
+		return
+	if(disease1.mutation_generation != disease2.mutation_generation)
+		if(disease1.mutation_generation > disease2.mutation_generation)
+			while(disease1.mutation_generation > disease2.mutation_generation)
+				disease1 = disease1.parent_mutation
+				distance += 1
+		else
+			while(disease1.mutation_generation < disease2.mutation_generation)
+				disease2 = disease2.parent_mutation
+				distance += 1
+
+	while(disease1 != disease2)
+		disease1 = disease1.parent_mutation
+		disease2 = disease2.parent_mutation
+		distance += 2
+	return distance
+
+/datum/disease/advance/proc/IsSameMutationTree(var/datum/disease/advance/D)
+	var/datum/disease/advance/disease1 = src
+	var/datum/disease/advance/disease2 = D
+	while(disease1.mutation_generation != 0 && disease2.mutation_generation != 0)
+		if(disease1.parent_mutation)
+			disease1 = disease1.parent_mutation
+		if(disease2.parent_mutation)
+			disease2 = disease2.parent_mutation
+	if(disease1 == disease2)
+		return TRUE
+	else
+		return FALSE
 
 // Mix the symptoms of two diseases (the src and the argument)
 /datum/disease/advance/proc/Mix(datum/disease/advance/D)
@@ -304,6 +384,21 @@ GLOBAL_LIST(advance_cures)
 		else
 			severity = "Unknown"
 
+/datum/disease/advance/proc/GetSeverity()
+
+	if(severity == NONTHREAT)
+		return 0
+	if(severity == MINOR)
+		return 1
+	if(severity == MEDIUM)
+		return 2
+	if(severity == HARMFUL)
+		return 3
+	if(severity == DANGEROUS)
+		return 4
+	if(severity == BIOHAZARD)
+		return 5
+
 
 // Will generate a random cure, the less resistance the symptoms have, the harder the cure.
 /datum/disease/advance/proc/GenerateCure(list/properties = list())
@@ -314,7 +409,7 @@ GLOBAL_LIST(advance_cures)
 		var/list/cure_names = list()
 		cure_names.len = cures.len
 		var/i = 0
-		for(var/C in cures)
+		for(var/N in cures)
 			i++
 			var/datum/reagent/C = GLOB.chemical_reagents_list[cures[i]]
 			cure_names[i] = C.name

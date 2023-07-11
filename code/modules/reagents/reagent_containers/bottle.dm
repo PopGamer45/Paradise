@@ -267,6 +267,12 @@
 	icon_state = "round_bottle"
 	list_reagents = list("diphenhydramine" = 30)
 
+/obj/item/reagent_containers/glass/bottle/stabilizing_agent
+	name = "stabilizing agent bottle"
+	desc = "A small bottle of stabilizing agent."
+	icon_state = "round_bottle"
+	list_reagents = list("stabilizing_agent" = 30)
+
 /obj/item/reagent_containers/glass/bottle/oculine
 	name = "oculine bottle"
 	desc = "A small bottle of combined eye and ear medication."

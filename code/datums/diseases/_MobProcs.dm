@@ -11,7 +11,7 @@
 	if(stat == DEAD)
 		return FALSE
 
-	if(D.GetDiseaseID() in resistances)
+	if(D.GetDiseaseID() in resistances || HasMutationResistance(D))
 		return FALSE
 
 	if(HasDisease(D))
@@ -24,6 +24,14 @@
 		return -1 //for stupid fucking monkies
 
 	return TRUE
+
+
+// Returns true if mob has mutation resistance to virus
+/mob/proc/HasMutationResistance(datum/disease/D)
+	for(var/data in mutation_resistances)
+		if(D.GetMutationDistance(GLOB.archive_diseases[data["virus"]]) <= data["mutation_reach"])
+			return TRUE
+	return FALSE
 
 
 /mob/proc/ContractDisease(datum/disease/D)

@@ -81,7 +81,7 @@
   */
 
 /datum/event/proc/get_weight_modifier()
-	return
+	return 0
 
 /**
   * Called when events are being picked based on weight.

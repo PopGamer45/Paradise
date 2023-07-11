@@ -152,6 +152,8 @@
 
 	var/list/viruses = list() // list of all diseases in a mob
 	var/list/resistances = list()
+	var/list/mutation_resistances = list() // list of all resistances to mutations of viruses
+	var/list/antibodies = list()
 
 	mouse_drag_pointer = MOUSE_ACTIVE_POINTER
 

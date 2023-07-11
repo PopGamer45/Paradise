@@ -754,7 +754,8 @@
 		/obj/item/reagent_containers/glass/bottle/flu_virion = 1,
 		/obj/item/reagent_containers/glass/bottle/mutagen = 1,
 		/obj/item/reagent_containers/glass/bottle/plasma = 1,
-		/obj/item/reagent_containers/glass/bottle/diphenhydramine = 1
+		/obj/item/reagent_containers/glass/bottle/diphenhydramine = 1,
+		/obj/item/reagent_containers/glass/bottle/stabilizing_agent = 1
 	)
 	. = ..()
 

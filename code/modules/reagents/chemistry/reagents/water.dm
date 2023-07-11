@@ -82,6 +82,7 @@
 				"blood_type" = null,
 				"blood_colour" = "#A10808",
 				"resistances" = null,
+				"antibodies" = null,
 				"trace_chem" = null,
 				"mind" = null,
 				"ckey" = null,
@@ -193,9 +194,17 @@
 	if(islist(data) && (method == REAGENT_INGEST))
 		for(var/thing in M.viruses)
 			var/datum/disease/D = thing
-			if(D.GetDiseaseID() in data)
-				D.cure()
-		M.resistances |= data
+			if(D.GetDiseaseID() in data["virus"] || D.GetMutationDistance(GLOB.archive_diseases[data["virus"]]) <= data["mutation_reach"])
+				D.cure(1)
+		M.resistances |= data["virus"]
+		if(data["mutation_reach"] > 0)
+			var/list/mutation_resistance_data = list()
+			mutation_resistance_data["virus"] = data["virus"]
+			mutation_resistance_data["mutation_reach"] = data["mutation_reach"]
+			if(list(mutation_resistance_data) in M.mutation_resistances)
+				return
+			else
+				M.mutation_resistances += list(mutation_resistance_data)
 
 /datum/reagent/vaccine/on_merge(list/data)
 	if(istype(data))

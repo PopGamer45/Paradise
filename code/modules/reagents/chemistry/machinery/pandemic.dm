@@ -30,14 +30,14 @@
 					var/list/viruses = BL.data["viruses"]
 					return viruses[index]
 
-/obj/machinery/computer/pandemic/proc/GetResistancesByIndex(index)
+/obj/machinery/computer/pandemic/proc/GetAntibodiesByIndex(index)
 	if(beaker && beaker.reagents)
 		if(beaker.reagents.reagent_list.len)
 			var/datum/reagent/blood/BL = locate() in beaker.reagents.reagent_list
 			if(BL)
-				if(BL.data && BL.data["resistances"])
-					var/list/resistances = BL.data["resistances"]
-					return resistances[index]
+				if(BL.data && BL.data["antibodies"])
+					var/list/antibodies = BL.data["antibodies"]
+					return antibodies[index]
 
 /obj/machinery/computer/pandemic/proc/GetVirusTypeByIndex(index)
 	var/datum/disease/D = GetVirusByIndex(index)
@@ -76,7 +76,7 @@
 			if(B)
 				B.pixel_x = rand(-3, 3)
 				B.pixel_y = rand(-3, 3)
-				var/path = GetResistancesByIndex(text2num(href_list["create_vaccine"]))
+				var/path = GetAntibodiesByIndex(text2num(href_list["create_vaccine"]))
 				var/vaccine_type = path
 				var/vaccine_name = "Unknown"
 
@@ -94,7 +94,10 @@
 				if(vaccine_type)
 
 					B.name = "[vaccine_name] vaccine bottle"
-					B.reagents.add_reagent("vaccine", 15, list(vaccine_type))
+					var/list/vaccine_data = list()
+					vaccine_data["virus"] = vaccine_type
+					vaccine_data["mutation_reach"] = 3 //"3" FOR TESTING PURPOSES
+					B.reagents.add_reagent("vaccine", 15, vaccine_data)
 					replicator_cooldown(200)
 		else
 			temp_html = "The replicator is not ready yet."
@@ -287,12 +290,12 @@
 				dat += "No detectable virus in the sample."
 
 			dat += "<BR><b>Contains antibodies to:</b> "
-			if(Blood.data["resistances"])
-				var/list/res = Blood.data["resistances"]
+			if(Blood.data["antibodies"])
+				var/list/res = Blood.data["antibodies"]
 				if(res.len)
 					dat += "<ul>"
 					var/i = 0
-					for(var/type in Blood.data["resistances"])
+					for(var/type in Blood.data["antibodies"])
 						i++
 						var/disease_name = "Unknown"
 

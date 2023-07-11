@@ -83,9 +83,9 @@ Bonus
 	var/mob/living/M = A.affected_mob
 	if(istype(M))
 		if(cured_diseases.len)
-			for(var/res in M.resistances)
+			for(var/res in M.antibodies)
 				if(res in cured_diseases)
-					M.resistances -= res
+					M.antibodies -= res
 		to_chat(M, "<span class='warning'>You feel weaker.</span>")
 
 /*

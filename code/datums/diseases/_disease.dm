@@ -35,7 +35,7 @@ GLOBAL_LIST_INIT(diseases, subtypesof(/datum/disease))
 /datum/disease
 	//Flags
 	var/visibility_flags = 0
-	var/disease_flags = CURABLE|CAN_CARRY|CAN_RESIST
+	var/disease_flags = CURABLE|CAN_CARRY
 	var/spread_flags = AIRBORNE
 
 	//Fluff
@@ -150,9 +150,10 @@ GLOBAL_LIST_INIT(diseases, subtypesof(/datum/disease))
 
 /datum/disease/proc/cure()
 	if(affected_mob)
-		if(disease_flags & CAN_RESIST)
+		if(disease_flags && CAN_RESIST)
 			if(!(type in affected_mob.resistances))
 				affected_mob.resistances += type
+		affected_mob.antibodies += type
 		remove_virus()
 		affected_mob.create_log(MISC_LOG, "has been cured from the virus \"[src]\"")
 	qdel(src)
@@ -166,6 +167,9 @@ GLOBAL_LIST_INIT(diseases, subtypesof(/datum/disease))
 			immunityLoss /= division_adjustment
 		immunityLoss += 1
 		return immunityLoss
+
+/datum/disease/proc/GetMutationDistance(datum/disease/D)
+	return
 
 /datum/disease/proc/IsSame(datum/disease/D)
 	if(istype(src, D.type))

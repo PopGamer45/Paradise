@@ -172,7 +172,7 @@
 	. = ..()
 	if(blood_type != null)
 		name = "[initial(name)] - [blood_type]"
-		reagents.add_reagent("blood", 200, list("donor"=null,"viruses"=null,"blood_DNA"=null,"blood_type"=blood_type,"blood_colour"=iv_blood_colour,"resistances"=null,"trace_chem"=null,"species"=blood_species,"species_only"=one_species_only))
+		reagents.add_reagent("blood", 200, list("donor"=null,"viruses"=null,"blood_DNA"=null,"blood_type"=blood_type,"blood_colour"=iv_blood_colour,"resistances"=null,"antibodies"=null,"trace_chem"=null,"species"=blood_species,"species_only"=one_species_only))
 		update_icon(UPDATE_OVERLAYS)
 
 
