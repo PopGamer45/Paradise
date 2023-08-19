@@ -191,20 +191,33 @@
 	taste_description = "antibodies"
 
 /datum/reagent/vaccine/reaction_mob(mob/living/M, method=REAGENT_TOUCH, volume)
+	log_debug("A") //FOR TESTING, DONT FORGET TO REMOVE
 	if(islist(data) && (method == REAGENT_INGEST))
+		log_debug("B") //FOR TESTING, DONT FORGET TO REMOVE
 		for(var/thing in M.viruses)
+			log_debug("C") //FOR TESTING, DONT FORGET TO REMOVE
 			var/datum/disease/D = thing
+			log_debug(D.GetMutationDistance(GLOB.archive_diseases[data["virus"]])) //FOR TESTING, DONT FORGET TO REMOVE
 			if(D.GetDiseaseID() in data["virus"] || D.GetMutationDistance(GLOB.archive_diseases[data["virus"]]) <= data["mutation_reach"])
+				log_debug("D") //FOR TESTING, DONT FORGET TO REMOVE
 				D.cure(1)
 		M.resistances |= data["virus"]
 		if(data["mutation_reach"] > 0)
 			var/list/mutation_resistance_data = list()
 			mutation_resistance_data["virus"] = data["virus"]
 			mutation_resistance_data["mutation_reach"] = data["mutation_reach"]
-			if(list(mutation_resistance_data) in M.mutation_resistances)
-				return
-			else
-				M.mutation_resistances += list(mutation_resistance_data)
+			var/skip = FALSE
+			for(var/list/resistance_data in M.mutation_resistances)
+				if(mutation_resistance_data["virus"] == resistance_data["virus"])
+					if(mutation_resistance_data["mutation_reach"] > resistance_data["mutation_reach"])
+						resistance_data["mutation_reach"] = mutation_resistance_data["mutation_reach"]
+					else
+						skip = TRUE
+						continue
+			if(!skip)
+				M.mutation_resistances += mutation_resistance_data
+
+
 
 /datum/reagent/vaccine/on_merge(list/data)
 	if(istype(data))

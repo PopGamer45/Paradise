@@ -162,7 +162,7 @@ GLOBAL_LIST(advance_cures)
 
 // Randomly mutates the virus either by adding or replacing symptoms
 /datum/disease/advance/proc/Mutate(var/cooldown = TRUE, var/forced = FALSE)
-	var/datum/disease/advance/parent = src.Copy()
+	var/datum/disease/parent = src.Copy()
 	var/datum/symptom/old_symptom
 	var/datum/symptom/new_symptom
 	if(!forced && !can_mutate && !affected_mob.reagents.has_reagent("spaceacillin"))
@@ -218,7 +218,7 @@ GLOBAL_LIST(advance_cures)
 				disease2 = disease2.parent_mutation
 				distance += 1
 
-	while(disease1 != disease2)
+	while(disease1.GetDiseaseID() != disease2.GetDiseaseID())
 		disease1 = disease1.parent_mutation
 		disease2 = disease2.parent_mutation
 		distance += 2
@@ -227,12 +227,14 @@ GLOBAL_LIST(advance_cures)
 /datum/disease/advance/proc/IsSameMutationTree(var/datum/disease/advance/D)
 	var/datum/disease/advance/disease1 = src
 	var/datum/disease/advance/disease2 = D
-	while(disease1.mutation_generation != 0 && disease2.mutation_generation != 0)
+	while(disease1.mutation_generation != 0 || disease2.mutation_generation != 0)
 		if(disease1.parent_mutation)
 			disease1 = disease1.parent_mutation
+		else
 		if(disease2.parent_mutation)
 			disease2 = disease2.parent_mutation
-	if(disease1 == disease2)
+		else
+	if(disease1.GetDiseaseID() == disease2.GetDiseaseID())
 		return TRUE
 	else
 		return FALSE

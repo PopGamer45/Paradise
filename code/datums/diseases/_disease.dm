@@ -169,6 +169,7 @@ GLOBAL_LIST_INIT(diseases, subtypesof(/datum/disease))
 		return immunityLoss
 
 /datum/disease/proc/GetMutationDistance(datum/disease/D)
+	log_debug("here")
 	return
 
 /datum/disease/proc/IsSame(datum/disease/D)
